@@ -3,30 +3,14 @@
 <head>
 	<meta charset="utf-8">
 	<title>MongoDB Manager</title>
-	<link rel="stylesheet" href="dijit/themes/claro/claro.css" type="text/css">
-	<link rel="stylesheet" href="dojox/grid/resources/claroGrid.css" type="text/css">
-	<style type="text/css" media="screen">
-		html, body{
-			height:100%;
-			padding:0;
-			margin:0;
-		}
-		.container {
-			height:100%;
-		}
-		.left, .right {
-			width:10em;
-		}
-		.blue{
-			background-color: #E9F4FE;
-			border: 1px solid #759DC0;
-		}
-	</style>
+	<link rel="stylesheet" href="bower_components/dijit/themes/claro/claro.css" type="text/css">
+	<link rel="stylesheet" href="bower_components/dojox/grid/resources/claroGrid.css" type="text/css">
+	<link rel="stylesheet" href="css/style.css" type="text/css">
 </head>
 <body class="claro">
 	<div id="preloader">Loading ...</div>
 	<div class="container" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design: 'headline'">
-		<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top'">MongoDb Manager</div>
+		<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top'">MongoDB Manager</div>
 		<div class="left" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'left', splitter: true">
 			<div id="tree"></div>
 		</div>
@@ -36,154 +20,28 @@
 					data-dojo-props="title: 'Welcome'">
 					<h1>Welcome to MongoDB Manager!</h1>
 				</div>
-				<div data-dojo-type="dijit/layout/ContentPane" id="content"
-					data-dojo-props="title: 'Content'"></div>
 			</div>
 		</div>
-		<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'bottom'">Bottom</div>
+		<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'bottom'">Status Bar</div>
 	</div>
 
-
-
-	<script type="text/javascript" charset="utf-8" src="dojo/dojo.js" data-dojo-config="async:0, parseOnLoad:0"></script>
 	<script type="text/javascript">
-		require(['dojo/_base/fx', 'dojo/parser', 
-			"dojo/dom", "dojo/dom-style", "dojo/json", "dojo/store/Memory", "dijit/tree/ObjectStoreModel", "dijit/Tree", 
-			'dojo/dom-construct', 'dojox/grid/DataGrid', 'dojo/data/ObjectStore',
-			'dijit/registry',
-			'dojox/rpc/Service', 'dojox/rpc/JsonRPC'], function (fxBase, parser, dom, domStyle, json, Memory, ObjectStoreModel, Tree,
-				domConstruct, DataGrid, ObjectStore, registry,
-			Service) {
-
-			parser.parse().then(function(objects){
-			    //Get rid of the loader once parsing is done
-				fxBase.fadeOut({
-					node: "preloader",
-					onEnd: function() {
-						domStyle.set("preloader", "display","none");
-					}
-				}).play();
-			});
-
-			var services = new Service({
-				target: "/rpc", // this defines the URL to connect for the services
-				transport: "POST", // We will use POST as the transport
-				envelope: "JSON-RPC-1.0", // We will use JSON-RPC
-				contentType: "application/json",
-				SMDVersion: "2.0",
-				additionalParameters: true,
-				services: {
-					"HelloService.Say":{
-						parameters: [{"name": "Who", 'type': 'string'}]
-					},
-					"RPCService.GetDBs":{},
-					"RPCService.GetCollections":{
-						parameters: [{"name": "dbname", 'type': 'string'}]
-					},
-					"RPCService.GetCollectionData":{
-						parameters: [
-							{"name": "dbname", 'type': 'string'},
-							{"name": "cname", 'type': 'string'}
-						]
-					}
-				}
-			});
-
-
-	var data = {
-		"id": "root",
-		"name": "root",
-		"parent": null,
-		"children": true
-	};
-
-   var treeStore = new Memory({
-        data: [data],
-        getChildren: function(object){
-			if (!object.parent) {
-				return services.RPCService.GetDBs().then(function (ret) {
-					var data = [];
-					ret.Result.forEach(function (name) {
-						data.push({
-							id: name,
-							name: name,
-							parent: object,
-							children: true
-						});
-					});
-					return data;
-				});
-			} else {
-				return services.RPCService.GetCollections({dbname: object.name}).then(function (ret) {
-					var data = [];
-					ret.Result.forEach(function (name) {
-						data.push({
-							id: name,
-							name: name,
-							parent: object
-						});
-					});
-					return data;
-				});
-			}
-        }
-    });
- 
-    var treeModel = new ObjectStoreModel({
-        store: treeStore,
-        query: {id: 'root'},
-        mayHaveChildren: function(item){
-            return "children" in item;
-        }
-    });
-
-	var addTab = function () {
-		// TODO
-		var tab = registry.byId(tabName);
-		if (typeof tab === "undefined"){
-			tab = new ContentPane({
-				id: tabName,
-				title: title,
-				href: href,
-				closable: closable,
-				style: "padding: 0;"
-			});
-			tabContainer.addChild(tab);
-		}
-		tabContainer.selectChild(tab);
-	};
-	  var tree = new Tree({
-        model: treeModel,
-		showRoot: false,
-        onOpenClick: true,
-        onClick: function(item){
-			if ('children' in item) return;
-
-			services.RPCService.GetCollectionData({dbname: item.parent.id, cname:item.id}).then(function (ret) {
-
-				if (typeof LASTGRID != 'undefined') {
-					LASTGRID.destroy();
-				}
-
-				var $node = domConstruct.create('div', {}, dom.byId('content'), 'last');
-				var store = new Memory({ data: ret.Result}),
-					dataStore = new ObjectStore({ objectStore: store });
-				var grid = new DataGrid({
-					store: dataStore,
-					query: { id: "*" },
-					structure: [
-						{ name: "Name", field: "name"},
-						{ name: "Phone", field: "phone"}
-					]
-				}, $node);
-				grid.startup();
-				LASTGRID = grid;
-			});
-        }
-    }, "tree");
-    tree.startup();
-
-		});
+		var dojoConfig = {
+			baseUrl: '/js/wtf',
+			packages: [
+				{name: 'dojo', location: '/bower_components/dojo'},
+				{name: 'dojox', location: '/bower_components/dojox'},
+				{name: 'dijit', location: '/bower_components/dijit'}
+			],
+			has: {
+				"dojo-debug-messages": true
+			},
+			parseOnLoad: false,
+			async: true
+		};
 	</script>
+
+	<script type="text/javascript" src="bower_components/dojo/dojo.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
 </body>
 </html>

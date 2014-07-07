@@ -3,16 +3,16 @@ package app
 type RPCService struct {}
 
 type StringList struct {
-	Result *[]string
+	Data *[]string
 }
 
 type GenericList struct {
-	Result *[]interface{}
+	Data *[]interface{}
 }
 
 func (h *RPCService) GetDBs(args *interface{}, ret *StringList) error {
 	data, _ := GetDBs()
-	ret.Result = &data
+	ret.Data = &data
     return nil
 }
 
@@ -21,7 +21,7 @@ func (h *RPCService) GetCollections(args *interface{}, ret *StringList) error {
 	dbname := args2["dbname"].(string)
 
 	data, _ := GetCollections(dbname)
-	ret.Result = &data
+	ret.Data = &data
     return nil
 }
 
@@ -31,6 +31,6 @@ func (h *RPCService) GetCollectionData(args *interface{}, ret *GenericList) erro
 	cname := args2["cname"].(string)
 
 	data, _ := GetCollectionData(dbname, cname)
-	ret.Result = &data
+	ret.Data = &data
     return nil
 }
