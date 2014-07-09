@@ -17,6 +17,13 @@ define(['dojox/rpc/Service', 'dojox/rpc/JsonRPC'], function(Service) {
 					{"name": "cname", 'type': 'string'}
 				]
 			},
+			"RPCService.InsertRecord":{
+				parameters: [
+					{"name": "dbname", 'type': 'string'},
+					{"name": "cname", 'type': 'string'},
+					{"name": "data", 'type': 'string'},
+				]
+			},
 			"RPCService.GetSchema":{
 				parameters: [
 					{"name": "dbname", 'type': 'string'},

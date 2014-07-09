@@ -15,7 +15,7 @@ func init() {
 
 	session = _session
 	if err != nil {
-		panic("Cant' connect DB")
+		panic(err)
 	}
 	// defer session.Close()
 }
@@ -32,6 +32,12 @@ func GetCollections(dbname string) (names []string, err error) {
 func GetCollectionData(dbname string, cname string) (results []interface{}, err error) {
 	db := session.DB(dbname)
 	err = db.C(cname).Find(bson.M{}).All(&results)
+	return
+}
+
+func InsertRecord(dbname, cname string, data *interface{}) (err error) {
+	db := session.DB(dbname)
+	err = db.C(cname).Insert(*data)
 	return
 }
 

@@ -122,5 +122,10 @@ require([
 	services.RPCService.GetSchema({dbname: 'test', cname: 'users'}).then(function (ret) {
 		console.log(ret);
 	});
+
+	var data = {name: 'jim123', job: 'fucker'};
+	services.RPCService.InsertRecord({dbname: 'test', cname: 'users', data: JSON.stringify(data)}).then(function (ret) {
+		console.log(ret);
+	});
 });
 

@@ -1,44 +1,58 @@
 package app
 
+import (
+	"encoding/json"
+)
+
 type RPCService struct {}
 
-type StringList struct {
-	Data *[]string
-}
-
-type GenericList struct {
-	Data *[]interface{}
-}
-
 type GenericObject struct {
-	Data *interface{}
+	Data *Anything
 }
 
 type Anything interface{}
 
-func (h *RPCService) GetDBs(args *interface{}, ret *StringList) error {
+func (h *RPCService) GetDBs(args *interface{}, ret *GenericObject) error {
 	data, _ := GetDBs()
-	ret.Data = &data
+	converted := Anything(data)
+	ret.Data = &converted
     return nil
 }
 
-func (h *RPCService) GetCollections(args *interface{}, ret *StringList) error {
+func (h *RPCService) GetCollections(args *interface{}, ret *GenericObject) error {
 	args2 := (*args).(map[string]interface{})
 	dbname := args2["dbname"].(string)
 
 	data, _ := GetCollections(dbname)
-	ret.Data = &data
+	converted := Anything(data)
+	ret.Data = &converted
     return nil
 }
 
-func (h *RPCService) GetCollectionData(args *interface{}, ret *GenericList) error {
+func (h *RPCService) GetCollectionData(args *interface{}, ret *GenericObject) error {
 	args2 := (*args).(map[string]interface{})
 	dbname := args2["dbname"].(string)
 	cname := args2["cname"].(string)
 
 	data, _ := GetCollectionData(dbname, cname)
-	ret.Data = &data
+	converted := Anything(data)
+	ret.Data = &converted
     return nil
+}
+
+// TODO
+// func (h *RPCService) InsertRecord(args *interface{}, ret *int) error {
+// use *int only return 0, how do I return 1?
+func (h *RPCService) InsertRecord(args *interface{}, ret *int) error {
+	args2 := (*args).(map[string]interface{})
+	dbname := args2["dbname"].(string)
+	cname := args2["cname"].(string)
+	data := args2["data"].(string)
+
+	var parsed interface{}
+	json.Unmarshal([]byte(data), &parsed)
+
+	return InsertRecord(dbname, cname, &parsed)
 }
 
 func (h *RPCService) GetSchema(args *interface{}, ret *GenericObject) error {
@@ -48,7 +62,7 @@ func (h *RPCService) GetSchema(args *interface{}, ret *GenericObject) error {
 
 	for _, s := range Config{
 		if s.Db == dbname && s.Collection == cname{
-			data := interface{}(s.Fields)
+			data := Anything(s.Fields)
 			ret.Data = &data
 			return nil
 		}
