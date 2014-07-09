@@ -4,8 +4,6 @@ import (
     "net/http"
     "log"
     "fmt"
-    "os"
-    "path"
     "github.com/gorilla/rpc"
     "github.com/gorilla/rpc/json"
     "./app"
@@ -16,16 +14,14 @@ var (
 )
 
 func main() {
-    s := rpc.NewServer()
-    s.RegisterCodec(json.NewCodec(), "application/json")
-    s.RegisterTCPService(new(app.RPCService), "")
-
 	// json rpc service
-    http.Handle("/rpc", s)
+    serv := rpc.NewServer()
+    serv.RegisterCodec(json.NewCodec(), "application/json")
+    serv.RegisterTCPService(new(app.RPCService), "")
+    http.Handle("/rpc", serv)
 
 	// static files
-	cwd, _ := os.Getwd()
-	http.Handle("/", http.FileServer(http.Dir(path.Join(cwd, "public"))))
+	http.Handle("/", http.FileServer(http.Dir(app.GetPublicDir())))
 
 	fmt.Println("Server running on port", PORT)
 	err := http.ListenAndServe(":" + PORT, nil)

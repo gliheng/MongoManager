@@ -1,0 +1,11 @@
+[
+	{
+		"Db": "test",
+		"Collection": "users",
+		"Fields": [
+			{"Key": "name", "Value": "string"},
+			{"Key": "age", "Value": "number"},
+			{"Key": "staff", "Value": "boolean"}
+		]
+	}
+]

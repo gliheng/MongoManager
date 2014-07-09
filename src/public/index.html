@@ -27,14 +27,15 @@
 
 	<script type="text/javascript">
 		var dojoConfig = {
-			baseUrl: '/js/wtf',
+			baseUrl: '/js',
 			packages: [
 				{name: 'dojo', location: '/bower_components/dojo'},
 				{name: 'dojox', location: '/bower_components/dojox'},
 				{name: 'dijit', location: '/bower_components/dijit'}
 			],
 			has: {
-				"dojo-debug-messages": true
+				'dojo-debug-messages': 1,
+				'config-tlmSiblingOfDojo': 0
 			},
 			parseOnLoad: false,
 			async: true

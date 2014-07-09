@@ -117,4 +117,10 @@ require([
 	}, "tree");
 	tree.startup();
 
+
+	// test
+	services.RPCService.GetSchema({dbname: 'test', cname: 'users'}).then(function (ret) {
+		console.log(ret);
+	});
 });
+

@@ -16,6 +16,12 @@ define(['dojox/rpc/Service', 'dojox/rpc/JsonRPC'], function(Service) {
 					{"name": "dbname", 'type': 'string'},
 					{"name": "cname", 'type': 'string'}
 				]
+			},
+			"RPCService.GetSchema":{
+				parameters: [
+					{"name": "dbname", 'type': 'string'},
+					{"name": "cname", 'type': 'string'}
+				]
 			}
 		}
 	});

@@ -10,6 +10,12 @@ type GenericList struct {
 	Data *[]interface{}
 }
 
+type GenericObject struct {
+	Data *interface{}
+}
+
+type Anything interface{}
+
 func (h *RPCService) GetDBs(args *interface{}, ret *StringList) error {
 	data, _ := GetDBs()
 	ret.Data = &data
@@ -33,4 +39,20 @@ func (h *RPCService) GetCollectionData(args *interface{}, ret *GenericList) erro
 	data, _ := GetCollectionData(dbname, cname)
 	ret.Data = &data
     return nil
+}
+
+func (h *RPCService) GetSchema(args *interface{}, ret *GenericObject) error {
+	args2 := (*args).(map[string]interface{})
+	dbname := args2["dbname"].(string)
+	cname := args2["cname"].(string)
+
+	for _, s := range Config{
+		if s.Db == dbname && s.Collection == cname{
+			data := interface{}(s.Fields)
+			ret.Data = &data
+			return nil
+		}
+	}
+
+	return nil
 }

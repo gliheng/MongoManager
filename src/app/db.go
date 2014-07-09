@@ -15,7 +15,7 @@ func init() {
 
 	session = _session
 	if err != nil {
-		panic(err)
+		panic("Cant' connect DB")
 	}
 	// defer session.Close()
 }
