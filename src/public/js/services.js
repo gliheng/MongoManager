@@ -9,7 +9,9 @@ define(['dojox/rpc/Service', 'dojox/rpc/JsonRPC'], function(Service) {
 		services: {
 			"RPCService.GetDBs":{},
 			"RPCService.GetCollections":{
-				parameters: [{"name": "dbname", 'type': 'string'}]
+				parameters: [
+					{"name": "dbname", 'type': 'string'}
+				]
 			},
 			"RPCService.GetCollectionData":{
 				parameters: [
@@ -21,7 +23,22 @@ define(['dojox/rpc/Service', 'dojox/rpc/JsonRPC'], function(Service) {
 				parameters: [
 					{"name": "dbname", 'type': 'string'},
 					{"name": "cname", 'type': 'string'},
-					{"name": "data", 'type': 'string'},
+					{"name": "data", 'type': 'string'}
+				]
+			},
+			"RPCService.UpdateRecord":{
+				parameters: [
+					{"name": "dbname", 'type': 'string'},
+					{"name": "cname", 'type': 'string'},
+					{"name": "id", 'type': 'string'},
+					{"name": "data", 'type': 'string'}
+				]
+			},
+			"RPCService.RemoveRecords":{
+				parameters: [
+					{"name": "dbname", 'type': 'string'},
+					{"name": "cname", 'type': 'string'},
+					{"name": "data", 'type': 'string'}
 				]
 			},
 			"RPCService.GetSchema":{

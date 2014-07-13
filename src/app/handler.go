@@ -2,48 +2,43 @@ package app
 
 import (
 	"encoding/json"
+	"strings"
 )
 
 type RPCService struct {}
 
-type GenericObject struct {
-	Data *Anything
-}
 
 type Anything interface{}
 
-func (h *RPCService) GetDBs(args *interface{}, ret *GenericObject) error {
+func (h *RPCService) GetDBs(args *Anything, ret *Anything) error {
 	data, _ := GetDBs()
 	converted := Anything(data)
-	ret.Data = &converted
+	*ret = &converted
     return nil
 }
 
-func (h *RPCService) GetCollections(args *interface{}, ret *GenericObject) error {
+func (h *RPCService) GetCollections(args *Anything, ret *Anything) error {
 	args2 := (*args).(map[string]interface{})
 	dbname := args2["dbname"].(string)
 
 	data, _ := GetCollections(dbname)
 	converted := Anything(data)
-	ret.Data = &converted
+	*ret = &converted
     return nil
 }
 
-func (h *RPCService) GetCollectionData(args *interface{}, ret *GenericObject) error {
+func (h *RPCService) GetCollectionData(args *Anything, ret *Anything) error {
 	args2 := (*args).(map[string]interface{})
 	dbname := args2["dbname"].(string)
 	cname := args2["cname"].(string)
 
 	data, _ := GetCollectionData(dbname, cname)
 	converted := Anything(data)
-	ret.Data = &converted
+	*ret = &converted
     return nil
 }
 
-// TODO
-// func (h *RPCService) InsertRecord(args *interface{}, ret *int) error {
-// use *int only return 0, how do I return 1?
-func (h *RPCService) InsertRecord(args *interface{}, ret *int) error {
+func (h *RPCService) InsertRecord(args *Anything, ret *string) error {
 	args2 := (*args).(map[string]interface{})
 	dbname := args2["dbname"].(string)
 	cname := args2["cname"].(string)
@@ -52,18 +47,51 @@ func (h *RPCService) InsertRecord(args *interface{}, ret *int) error {
 	var parsed interface{}
 	json.Unmarshal([]byte(data), &parsed)
 
-	return InsertRecord(dbname, cname, &parsed)
+	// TODO: verify schema
+	id, err := InsertRecord(dbname, cname, parsed)
+
+	*ret = id.Hex()
+	return err
 }
 
-func (h *RPCService) GetSchema(args *interface{}, ret *GenericObject) error {
+func (h *RPCService) UpdateRecord(args *Anything, ret *int) error {
+	args2 := (*args).(map[string]interface{})
+	dbname := args2["dbname"].(string)
+	cname := args2["cname"].(string)
+	id := args2["id"].(string)
+	data := args2["data"].(string)
+
+	var parsed interface{}
+	json.Unmarshal([]byte(data), &parsed)
+	*ret = 0
+
+	// TODO: verify schema
+	return UpdateRecord(dbname, cname, id, &parsed)
+}
+
+func (h *RPCService) RemoveRecords(args *Anything, ret *int) error {
+	args2 := (*args).(map[string]interface{})
+	dbname := args2["dbname"].(string)
+	cname := args2["cname"].(string)
+	data := args2["data"].(string)
+
+	idlist := strings.Split(data, ",")
+	// one inserted
+	*ret = 0
+
+	// TODO: verify schema
+	return RemoveRecords(dbname, cname, idlist)
+}
+
+func (h *RPCService) GetSchema(args *Anything, ret *Anything) error {
 	args2 := (*args).(map[string]interface{})
 	dbname := args2["dbname"].(string)
 	cname := args2["cname"].(string)
 
 	for _, s := range Config{
 		if s.Db == dbname && s.Collection == cname{
-			data := Anything(s.Fields)
-			ret.Data = &data
+			data := Anything(s.Schema)
+			*ret = &data
 			return nil
 		}
 	}

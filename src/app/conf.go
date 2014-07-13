@@ -10,7 +10,7 @@ import (
 type Schema struct {
 	Db string
 	Collection string
-	Fields []Field
+	Schema interface{}
 }
 
 type Field struct {

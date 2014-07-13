@@ -35,10 +35,29 @@ func GetCollectionData(dbname string, cname string) (results []interface{}, err 
 	return
 }
 
-func InsertRecord(dbname, cname string, data *interface{}) (err error) {
+func InsertRecord(dbname, cname string, data interface{}) (id bson.ObjectId, err error) {
 	db := session.DB(dbname)
-	err = db.C(cname).Insert(*data)
+	id = bson.NewObjectId()
+	mdata := data.(map[string]interface{})
+	mdata["_id"] = id
+	err = db.C(cname).Insert(mdata)
 	return
 }
 
+func UpdateRecord(dbname, cname, id string, data *interface{}) (err error) {
+	db := session.DB(dbname)
+	err = db.C(cname).UpdateId(bson.ObjectIdHex(id), *data)
+	return
+}
 
+func RemoveRecords(dbname, cname string, data []string) (err error) {
+	db := session.DB(dbname)
+	for _, id := range data{
+		objectId := bson.ObjectIdHex(id)
+		err = db.C(cname).RemoveId(objectId)
+		if err != nil {
+			return
+		}
+	}
+	return
+}

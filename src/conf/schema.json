@@ -2,10 +2,10 @@
 	{
 		"Db": "test",
 		"Collection": "users",
-		"Fields": [
-			{"Key": "name", "Value": "string"},
-			{"Key": "age", "Value": "number"},
-			{"Key": "staff", "Value": "boolean"}
+		"Schema": [
+			{"name": "Name", "field": "name", "_type": "string"},
+			{"name": "Age", "field": "age", "_type": "number"},
+			{"name": "Staff", "field": "staff", "_type": "boolean"}
 		]
 	}
 ]
