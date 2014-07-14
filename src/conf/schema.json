@@ -1,11 +1,13 @@
-[
-	{
-		"Db": "test",
-		"Collection": "users",
-		"Schema": [
-			{"name": "Name", "field": "name", "_type": "string"},
-			{"name": "Age", "field": "age", "_type": "number"},
-			{"name": "Staff", "field": "staff", "_type": "boolean"}
-		]
-	}
-]
+{
+	"DBSchema": [
+		{
+			"Db": "test",
+			"Collection": "users",
+			"Schema": [
+				{"name": "Name", "field": "name", "_type": "string"},
+				{"name": "Age", "field": "age", "_type": "number"},
+				{"name": "Staff", "field": "staff", "_type": "boolean"}
+			]
+		}
+	]
+}

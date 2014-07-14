@@ -88,7 +88,7 @@ func (h *RPCService) GetSchema(args *Anything, ret *Anything) error {
 	dbname := args2["dbname"].(string)
 	cname := args2["cname"].(string)
 
-	for _, s := range Config{
+	for _, s := range DBSchema{
 		if s.Db == dbname && s.Collection == cname{
 			data := Anything(s.Schema)
 			*ret = &data

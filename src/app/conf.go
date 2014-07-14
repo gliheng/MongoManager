@@ -18,7 +18,8 @@ type Field struct {
 	Value string
 }
 
-var Config []Schema
+var Config map[string]interface{}
+var DBSchema []Schema
 var Cwd string
 
 func init() {
@@ -28,6 +29,12 @@ func init() {
 	err := json.Unmarshal(bytes, &Config)
 	if err != nil{
 		panic("Can't read config")
+	}
+
+	dbschema := Config["DBSchema"].([]interface{})
+	for _, schema := range dbschema {
+		s := schema.(map[string]interface{})
+		DBSchema = append(DBSchema, Schema{Db: s["Db"].(string), Collection: s["Collection"].(string), Schema: s["Schema"]});
 	}
 }
 
