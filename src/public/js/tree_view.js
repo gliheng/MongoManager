@@ -1,8 +1,12 @@
 define([
-	'services',
+	'dijit/registry', 'services',
+	'dojo/dom', 'dijit/form/Button',
+	'dojo/store/Observable', 'dojo/aspect',
 	'dojo', 'dojo/topic', "dijit/tree/ObjectStoreModel", "dojo/store/Memory", "dijit/Tree"
 ], function (
-	services,
+	registry, services,
+	dom, Button,
+	Observable, aspect,
 	dojo, topic, ObjectStoreModel, Memory, Tree
 ) {
 	var data = {
@@ -44,6 +48,23 @@ define([
 		}
 	});
 
+
+	// To support dynamic data changes, including DnD,
+    // the store must support put(child, {parent: parent}).
+    // But dojo/store/Memory doesn't, so we have to implement it.
+    // Since our store is relational, that just amounts to setting child.parent
+    // to the parent's id.
+    aspect.around(treeStore, "put", function(originalPut){
+        return function(obj, options){
+            if(options && options.parent){
+                obj.parent = options.parent.id;
+            }
+            return originalPut.call(treeStore, obj, options);
+        }
+    });
+
+	treeStore = new Observable(treeStore);
+
 	var treeModel = new ObjectStoreModel({
 		store: treeStore,
 		query: {id: 'root'},
@@ -62,8 +83,33 @@ define([
 			topic.publish('addTab', item.parent.id, item.id);
 		}
 	}, "tree");
+	tree.startup();
 
-	// tree.startup();
+	var $bar = dom.byId('create_bar');
+	new Button({
+		iconClass: 'dijitIconNewTask',
+		label: 'New DB',
+		showLabel: false,
+		onClick: function () {
+			// TODO: does not work
+			var childItem = {
+				name: "New child",
+				id: Math.random()
+			};
+			treeStore.put(childItem, {
+				parent: tree.get("selectedItems")[0],
+				overwrite: true
+			});
+		}
+	}).placeAt($bar);
+
+	new Button({
+		iconClass: 'dijitIconDocuments',
+		label: 'New Collection',
+		showLabel: false,
+		onClick: function () {
+		}
+	}).placeAt($bar);
 
 	return tree;
 });

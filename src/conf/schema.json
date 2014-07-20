@@ -8,6 +8,34 @@
 				{"name": "Age", "field": "age", "_type": "number"},
 				{"name": "Staff", "field": "staff", "_type": "boolean"}
 			]
+		},
+		{
+			"Db": "test",
+			"Collection": "order_summary",
+			"Schema": [
+				{"name": "UserId", "field": "user_id", "_type": "string"},
+				{"name": "Weight", "field": "weight", "_type": "number"},
+				{"name": "Status", "field": "status", "_type": "number"},
+				{"name": "Shipping", "field": "shipping", "_type": "string"},
+				{"name": "Amount", "field": "amount", "_type": "number"},
+				{"name": "OriginTime", "field": "origin_time", "_type": "number"},
+				{"name": "PayableTime", "field": "payable_time", "_type": "number"},
+				{"name": "DeliveryTime", "field": "delivery_time", "_type": "number"}
+			]
+		},
+		{
+			"Db": "test",
+			"Collection": "order_sub",
+			"Schema": [
+				{"name": "SummaryId", "field": "summary_id", "_type": "string"},
+				{"name": "Name", "field": "name", "_type": "string"},
+				{"name": "Label", "field": "label", "_type": "string"},
+				{"name": "Price", "field": "price", "_type": "number"},
+				{"name": "Status", "field": "status", "_type": "number"},
+				{"name": "Weight", "field": "weight", "_type": "number"},
+				{"name": "Quantity", "field": "quantity", "_type": "number"},
+				{"name": "Image", "field": "img", "_type": "string"}
+			]
 		}
 	]
 }

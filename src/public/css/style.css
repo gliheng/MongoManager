@@ -31,3 +31,10 @@ html, body{
 	border: 1px solid #759DC0;
 }
 
+#form .name {
+	width:50px;
+	display:inline-block;
+	margin:4px;
+	margin-left:0;
+}
+

@@ -1,7 +1,8 @@
 require([
-	'dojo/_base/fx', 'dojo/parser', "dojo/dom-style",
-	'services', 'tree_view', 'grid_view'
-], function (fxBase, parser, domStyle) {
+	'dojo/_base/fx', 'dojo/parser', "dojo/dom-style", 'dojo/topic',
+	'tree_view', 'grid_view'
+], function (fxBase, parser, domStyle, topic,
+	tree, grid) {
 
 	parser.parse().then(function(objects){
 		//Get rid of the loader once parsing is done
@@ -12,6 +13,8 @@ require([
 			}
 		}).play();
 	});
+
+	topic.subscribe('addTab', grid.addTab);
 
 });
 
