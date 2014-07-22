@@ -33,7 +33,13 @@ define([
 			var data = ret[0],
 				schema = ret[1];
 
+			if (!schema && !data) {
+				alert('No data, no shema, what the hell!');
+				return;
+			}
+
 			if (!schema) {
+				// infer schema from data
 				schema = [];
 				if (data.length >= 0) {
 					var first = data[0];

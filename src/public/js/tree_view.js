@@ -9,40 +9,45 @@ define([
 	Observable, aspect,
 	dojo, topic, ObjectStoreModel, Memory, Tree
 ) {
-	var data = {
+	var data = [{
 		"id": "root",
 		"name": "root",
 		"parent": null,
 		"children": true
-	};
+	}];
 
 	var treeStore = new Memory({
-		data: [data],
+		data: data,
 		getChildren: function(object){
+			var self = this;
 			if (!object.parent) {
 				return services.RPCService.GetDBs().then(function (ret) {
-					var data = [];
+					ret = ret || [];
 					ret.forEach(function (name) {
-						data.push({
-							id: name,
+						var item = {
+							id: 'DB:' + name,
 							name: name,
-							parent: object,
+							parent: object.id,
 							children: true
-						});
+						};
+
+						data.push(item);
 					});
-					return data;
+					return self.query({parent: object.id});
 				});
 			} else {
 				return services.RPCService.GetCollections({dbname: object.name}).then(function (ret) {
-					var data = [];
+					ret = ret || [];
 					ret.forEach(function (name) {
-						data.push({
-							id: name,
+						var item = {
+							id: 'Collection:' + name,
 							name: name,
-							parent: object
-						});
+							parent: object.id
+						};
+
+						data.push(item);
 					});
-					return data;
+					return self.query({parent: object.id});
 				});
 			}
 		}
@@ -54,6 +59,7 @@ define([
     // But dojo/store/Memory doesn't, so we have to implement it.
     // Since our store is relational, that just amounts to setting child.parent
     // to the parent's id.
+	/*
     aspect.around(treeStore, "put", function(originalPut){
         return function(obj, options){
             if(options && options.parent){
@@ -62,6 +68,7 @@ define([
             return originalPut.call(treeStore, obj, options);
         }
     });
+	*/
 
 	treeStore = new Observable(treeStore);
 
@@ -80,7 +87,8 @@ define([
 		onClick: function(item){
 			if ('children' in item) return;
 
-			topic.publish('addTab', item.parent.id, item.id);
+			var parent = treeStore.query({id:item.parent})[0];
+			topic.publish('addTab', parent.name, item.name);
 		}
 	}, "tree");
 	tree.startup();
@@ -91,15 +99,27 @@ define([
 		label: 'New DB',
 		showLabel: false,
 		onClick: function () {
-			// TODO: does not work
+			var dbname = prompt('DB name?');
+			if (!dbname) {
+				return alert('Need a DB name!');
+			}
+
 			var childItem = {
-				name: "New child",
-				id: Math.random()
+				name: dbname,
+				id: 'DB:' + dbname,
+				parent: 'root',
+				children: true
 			};
-			treeStore.put(childItem, {
-				parent: tree.get("selectedItems")[0],
-				overwrite: true
-			});
+
+			// update tree
+			treeStore.add(childItem);
+
+			// hack! dijit/tree does not update when the data is loaded by a promise
+			var children = treeStore.query({parent:'root'});
+			treeModel.childrenCache['root'] = children;
+			// treeModel.onChange(childItem);
+			treeModel.onChildrenChange(data[0], children);
+			
 		}
 	}).placeAt($bar);
 
@@ -108,6 +128,28 @@ define([
 		label: 'New Collection',
 		showLabel: false,
 		onClick: function () {
+			var obj = tree.get("selectedItems")[0];
+			if (!obj) return;
+
+			var cname = prompt('Collection name?');
+			if (!cname) {
+				return alert('Need a collection name!');
+			}
+
+			var childItem = {
+				name: cname,
+				id: 'Collection:' + cname,
+				parent: obj.id
+			};
+
+			// update tree
+			treeStore.add(childItem);
+
+			// hack! dijit/tree does not update when the data is loaded by a promise
+			var children = treeStore.query({parent: obj.id});
+			treeModel.childrenCache[obj.id] = children;
+			// treeModel.onChange(childItem);
+			treeModel.onChildrenChange(obj, children);
 		}
 	}).placeAt($bar);
 
